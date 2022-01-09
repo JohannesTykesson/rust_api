@@ -1,4 +1,5 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+mod database;
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -16,6 +17,7 @@ async fn manual_hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let _ = database::create_database();
     HttpServer::new(|| {
         App::new()
             .service(hello)
