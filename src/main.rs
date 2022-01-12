@@ -1,28 +1,19 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 mod database;
-
-#[get("/")]
-async fn hello() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
-#[post("/echo")]
-async fn echo(req_body: String) -> impl Responder {
-    HttpResponse::Ok().body(req_body)
-}
-
-async fn manual_hello() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
+mod handlers;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let _ = database::create_database();
+    let conn = "postgres";
+    let result = database::Database::new(conn.to_string());
+    let db = match result {
+        Err(e) => return Err(e),
+        Ok(f) => f,
+    };
     HttpServer::new(|| {
         App::new()
-            .service(hello)
-            .service(echo)
-            .route("/hey", web::get().to(manual_hello))
+            .route("/add/{ticker}", web::post().to(crate::handlers::add_ticker(conn.to_string(), db)))
+
     })
     .bind("127.0.0.1:8080")?
     .run()
