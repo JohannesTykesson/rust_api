@@ -21,7 +21,7 @@ impl Database {
                 ");
                 return Ok(database);
             },
-            Err(e) => return Err(e),
+            Err(e) => return Error(e),
         }
     }
 
